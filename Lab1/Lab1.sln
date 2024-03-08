@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34622.214
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lab1", "Lab1.csproj", "{ACCBDFC5-8885-4496-BF0C-31E416C0D37C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProject", "..\TestProject\TestProject.csproj", "{5BE26221-75BF-4D61-B629-99C252E7202B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GUI", "..\GUI\GUI.csproj", "{95C082C2-FBE3-4DE7-B7C5-0E390AC280C0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ACCBDFC5-8885-4496-BF0C-31E416C0D37C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACCBDFC5-8885-4496-BF0C-31E416C0D37C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACCBDFC5-8885-4496-BF0C-31E416C0D37C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACCBDFC5-8885-4496-BF0C-31E416C0D37C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BE26221-75BF-4D61-B629-99C252E7202B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BE26221-75BF-4D61-B629-99C252E7202B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BE26221-75BF-4D61-B629-99C252E7202B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BE26221-75BF-4D61-B629-99C252E7202B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95C082C2-FBE3-4DE7-B7C5-0E390AC280C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95C082C2-FBE3-4DE7-B7C5-0E390AC280C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95C082C2-FBE3-4DE7-B7C5-0E390AC280C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95C082C2-FBE3-4DE7-B7C5-0E390AC280C0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {82F934C6-5D4E-4BD6-8F51-8D70253E331B}
+	EndGlobalSection
+EndGlobal
