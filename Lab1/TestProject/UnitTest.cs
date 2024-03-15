@@ -18,7 +18,7 @@ namespace TestProject
 
         // Tests to do from pdf
         [TestMethod]
-        public void Test_AtLeastOneItemReturned()
+        public void Test_At_Least_One_Item_Returned()
         {
             Problem problem = new(5);
             problem.Solve(10);
@@ -28,7 +28,7 @@ namespace TestProject
         }
 
         [TestMethod]
-        public void Test_EmptySolutionReturned()
+        public void Test_Empty_Solution_Returned()
         {
             Problem problem = new(5);
             problem.Solve(0);
@@ -38,7 +38,7 @@ namespace TestProject
         }
 
         [TestMethod]
-        public void Test_ItemOrderDoesNotAffectSolution()
+        public void Test_Item_Order_Does_Not_Affect_Solution()
         {
             Problem problem = new(5);
             List<Item> originalList = new(problem.items);
@@ -57,7 +57,7 @@ namespace TestProject
         }
 
         [TestMethod]
-        public void Test_SpecificInstance()
+        public void Test_Specific_Instance()
         {
             Problem problem = new(5);
             problem.Solve(10);

@@ -38,7 +38,7 @@
             label4 = new Label();
             label5 = new Label();
             listBox1 = new ListBox();
-            listBox = new ListBox();
+            listBox2 = new ListBox();
             SuspendLayout();
             // 
             // button1
@@ -46,7 +46,7 @@
             button1.BackColor = SystemColors.InactiveCaption;
             button1.Font = new Font("Cambria", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
             button1.Location = new Point(20, 155);
-            button1.Margin = new Padding(2, 2, 2, 2);
+            button1.Margin = new Padding(2);
             button1.Name = "button1";
             button1.Size = new Size(172, 28);
             button1.TabIndex = 0;
@@ -57,33 +57,26 @@
             // textBox1
             // 
             textBox1.Location = new Point(20, 28);
-            textBox1.Margin = new Padding(2, 2, 2, 2);
+            textBox1.Margin = new Padding(2);
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(173, 23);
             textBox1.TabIndex = 1;
-            textBox1.Click += textBox1_TextChanged;
-            textBox1.TextChanged += textBox1_TextChanged;
-            textBox1.DataContextChanged += textBox1_TextChanged;
             // 
             // textBox2
             // 
             textBox2.Location = new Point(20, 73);
-            textBox2.Margin = new Padding(2, 2, 2, 2);
+            textBox2.Margin = new Padding(2);
             textBox2.Name = "textBox2";
             textBox2.Size = new Size(173, 23);
             textBox2.TabIndex = 2;
-            textBox2.Click += textBox2_TextChanged;
-            textBox2.TextChanged += textBox2_TextChanged;
-            textBox2.DataContextChanged += textBox2_TextChanged;
             // 
             // textBox3
             // 
             textBox3.Location = new Point(20, 123);
-            textBox3.Margin = new Padding(2, 2, 2, 2);
+            textBox3.Margin = new Padding(2);
             textBox3.Name = "textBox3";
             textBox3.Size = new Size(173, 23);
             textBox3.TabIndex = 3;
-            textBox3.TextChanged += textBox3_TextChanged;
             // 
             // label1
             // 
@@ -94,7 +87,6 @@
             label1.Size = new Size(116, 15);
             label1.TabIndex = 4;
             label1.Text = "Number of elements";
-            label1.Click += label1_Click;
             // 
             // label2
             // 
@@ -105,7 +97,6 @@
             label2.Size = new Size(63, 15);
             label2.TabIndex = 5;
             label2.Text = "Seed Value";
-            label2.Click += label2_Click;
             // 
             // label3
             // 
@@ -141,37 +132,29 @@
             // 
             listBox1.FormattingEnabled = true;
             listBox1.ItemHeight = 15;
-            listBox1.Location = new Point(230, 22);
-            listBox1.Margin = new Padding(2, 2, 2, 2);
-            listBox1.MultiColumn = true;
+            listBox1.Location = new Point(20, 206);
             listBox1.Name = "listBox1";
-            listBox1.Size = new Size(418, 289);
-            listBox1.TabIndex = 8;
-            listBox1.SelectedIndexChanged += listBox1_SelectedIndexChanged;
-            listBox1.DataContextChanged += listBox1_SelectedIndexChanged;
+            listBox1.Size = new Size(172, 109);
+            listBox1.TabIndex = 12;
             // 
-            // listBox
+            // listBox2
             // 
-            listBox.FormattingEnabled = true;
-            listBox.ItemHeight = 15;
-            listBox.Location = new Point(20, 205);
-            listBox.Margin = new Padding(2, 2, 2, 2);
-            listBox.MultiColumn = true;
-            listBox.Name = "listBox";
-            listBox.Size = new Size(176, 109);
-            listBox.TabIndex = 10;
-            listBox.SelectedIndexChanged += listBox2_SelectedIndexChanged;
-            listBox.DataContextChanged += listBox2_SelectedIndexChanged;
+            listBox2.FormattingEnabled = true;
+            listBox2.ItemHeight = 15;
+            listBox2.Location = new Point(230, 27);
+            listBox2.Name = "listBox2";
+            listBox2.Size = new Size(368, 289);
+            listBox2.TabIndex = 13;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(676, 332);
-            Controls.Add(label5);
-            Controls.Add(listBox);
-            Controls.Add(label4);
+            Controls.Add(listBox2);
             Controls.Add(listBox1);
+            Controls.Add(label5);
+            Controls.Add(label4);
             Controls.Add(label3);
             Controls.Add(label2);
             Controls.Add(label1);
@@ -179,7 +162,7 @@
             Controls.Add(textBox2);
             Controls.Add(textBox1);
             Controls.Add(button1);
-            Margin = new Padding(2, 2, 2, 2);
+            Margin = new Padding(2);
             Name = "Form1";
             Text = "Form1";
             ResumeLayout(false);
@@ -195,9 +178,9 @@
         private Label label1;
         private Label label2;
         private Label label3;
-        private ListBox listBox1;
         private Label label4;
-        private ListBox listBox;
         private Label label5;
+        private ListBox listBox1;
+        private ListBox listBox2;
     }
 }

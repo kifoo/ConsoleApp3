@@ -4,25 +4,18 @@ namespace GUI
 {
     public partial class Form1 : Form
     {
-        Problem problem;
-        int n;
-        int seed;
-        int capacity;
-
         public Form1()
         {
             InitializeComponent();
         }
 
-        public void run_problem()
+        private void button1_Click(object sender, EventArgs e)
         {
-            problem = new Problem(n, seed);
-        }
+            int n = 0;
+            int seed = 0;
+            int capacity = 0;
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-            int value;
-            if (int.TryParse(textBox1.Text, out value) && value > 0)
+            if (int.TryParse(textBox1.Text, out int value) && value > 0)
             {
                 n = value;
             }
@@ -30,70 +23,43 @@ namespace GUI
             {
                 textBox1.Clear();
             }
-        }
-
-        private void textBox2_TextChanged(object sender, EventArgs e)
-        {
-            int value;
             if (int.TryParse(textBox2.Text, out value) && value > 0)
             {
                 seed = value;
             }
             else
             {
-                textBox1.Clear();
+                textBox2.Clear();
             }
-        }
-
-        private void textBox3_TextChanged(object sender, EventArgs e)
-        {
-            int value;
             if (int.TryParse(textBox3.Text, out value) && value > 0)
             {
                 capacity = value;
             }
             else
             {
-                textBox1.Clear();
+                textBox3.Clear();
             }
-        }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            problem = new Problem(n, seed);
+            Problem problem = new(n, seed);
 
             if (problem != null)
             {
+                string res = "";
                 problem.Solve(capacity);
-                listBox1.Text = problem.items.ToString();
-                listBox.Text = problem.Result_obj.ToString();
- 
+                listBox1.Items.Add("Total value: " + problem.Result_obj.Total_value);
+                listBox1.Items.Add("Total weight: " + problem.Result_obj.Total_weight);
+                for (int i = 0; i < problem.Result_obj.result.Count; i++)
+                {
+                    res += problem.Result_obj.result[i].Id + ", ";
+                }
+                listBox1.Items.Add("Items: " + res);
+                for (int i = 0; i < problem.items.Count; i++)
+                {
+                    listBox2.Items.Add(problem.items[i].ToString());
+                    
+                }
+
             }
         }
-
-        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (listBox1.SelectedItem is Item)
-            {
-                Item selectedItem = (Item)listBox1.SelectedItem;
-                // textBox3.Text = selectedItem.ToString();
-            }
-        }
-
-        private void listBox2_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            
-        }
-
-        private void label2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
     }
 }
