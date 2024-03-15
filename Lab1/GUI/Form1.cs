@@ -9,24 +9,12 @@ namespace GUI
             InitializeComponent();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Button1_Click(object sender, EventArgs e)
         {
-            int n = 0;
-            int seed = 0;
-            int capacity = 0;
 
-            if (int.TryParse(numericUpDown1.Text, out int value) && value > 0)
-            {
-                n = value;
-            }
-            if (int.TryParse(numericUpDown2.Text, out value) && value > 0)
-            {
-                seed = value;
-            }
-            if (int.TryParse(numericUpDown3.Text, out value) && value > 0)
-            {
-                capacity = value;
-            }
+            if (int.TryParse(numericUpDown1.Text, out int n) && n > 0) { }
+            if (int.TryParse(numericUpDown2.Text, out int seed) && seed > 0) { }
+            if (int.TryParse(numericUpDown3.Text, out int capacity) && capacity > 0) { }
 
             Problem problem = new(n, seed);
 

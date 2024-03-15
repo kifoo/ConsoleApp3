@@ -1,5 +1,6 @@
 
 using Lab1;
+using System.Linq;
 namespace TestProject
 {
     [TestClass]
@@ -24,7 +25,7 @@ namespace TestProject
             problem.Solve(10);
 
             // Assert
-            Assert.IsTrue(problem.Result_List.Count > 0);
+            Assert.IsTrue(problem.Result_obj.result.Count > 0);
         }
 
         [TestMethod]
@@ -34,7 +35,7 @@ namespace TestProject
             problem.Solve(0);
 
             // Assert
-            Assert.IsTrue(problem.Result_List.Count == 0);
+            Assert.IsTrue(problem.Result_obj.result.Count == 0);
         }
 
         [TestMethod]
@@ -53,7 +54,7 @@ namespace TestProject
             shuffleProblem.Solve(10);
 
             // Assert
-            Assert.AreEqual(originalProblem.Result_List, shuffleProblem.Result_List);
+            Assert.AreEqual(originalProblem.Result_obj.result, shuffleProblem.Result_obj.result);
         }
 
         [TestMethod]
@@ -63,17 +64,28 @@ namespace TestProject
             problem.Solve(10);
 
             // Assert
-            Assert.AreEqual(0, problem.Result_List[0].Id);
-            Assert.AreEqual(3, problem.Result_List[0].Values);
-            Assert.AreEqual(2, problem.Result_List[0].Weights);
-            Assert.AreEqual(2, problem.Result_List[1].Id);
-            Assert.AreEqual(7, problem.Result_List[1].Values);
-            Assert.AreEqual(5, problem.Result_List[1].Weights);
+            Assert.AreEqual(0, problem.Result_obj.result[0].Id);
+            Assert.AreEqual(3, problem.Result_obj.result[0].Values);
+            Assert.AreEqual(2, problem.Result_obj.result[0].Weights);
+            Assert.AreEqual(2, problem.Result_obj.result[1].Id);
+            Assert.AreEqual(7, problem.Result_obj.result[1].Values);
+            Assert.AreEqual(5, problem.Result_obj.result[1].Weights);
         }
 
 
         // My own Test
 
+        // Check if provided data is in range <1, 10>
+        [TestMethod]
+        public void Test_Weights_And_Values_In_Range()
+        {
+            Problem problem = new(5);
+            for (int i = 0; i < 5; i++)
+            {
+                Assert.IsTrue(problem.items[i].Weights >= 1 && problem.items[i].Weights <= 10);
+                Assert.IsTrue(problem.items[i].Values >= 1 && problem.items[i].Values <= 10);
+            }
+        }
         // Test if Solve method it sorting items correctly by ratio
         [TestMethod]
         public void Test_Solve_Sorts_Items_By_Ratio()
@@ -101,17 +113,17 @@ namespace TestProject
             Problem problem = new(5);
 
             //class Problem
-            string expectedString = "no.: 0\t value: 3\t weigth: 2\n" +
-                                    "no.: 1\t value: 5\t weigth: 8\n" +
-                                    "no.: 2\t value: 7\t weigth: 5\n" +
-                                    "no.: 3\t value: 4\t weigth: 10\n" +
-                                    "no.: 4\t value: 2\t weigth: 7\n";
+            string expectedString = "no.: 0\t value: 3  \t weigth: 2\n" +
+                                    "no.: 1\t value: 5  \t weigth: 8\n" +
+                                    "no.: 2\t value: 7  \t weigth: 5\n" +
+                                    "no.: 3\t value: 4  \t weigth: 10\n" +
+                                    "no.: 4\t value: 2  \t weigth: 7\n";
             Assert.AreEqual(expectedString, problem.ToString());
 
             //class Item
-            expectedString = "no.: 0\t value: 3\t weigth: 2\n";
+            expectedString = "no.: 0\t value: 3  \t weigth: 2\n";
             Assert.AreEqual(expectedString, problem.items[0].ToString());
-            expectedString = "no.: 4\t value: 2\t weigth: 7\n";
+            expectedString = "no.: 4\t value: 2  \t weigth: 7\n";
             Assert.AreEqual(expectedString, problem.items[4].ToString());
 
             //class Result
@@ -120,17 +132,6 @@ namespace TestProject
             Assert.AreEqual(expectedString, problem.Result_obj.ToString());
         }
 
-        // Check if provided data is in range <1, 10>
-        [TestMethod]
-        public void Test_Weights_And_Values_In_Range()
-        {
-            Problem problem = new(5);
-            for(int i = 0; i < 5; i++)
-            {
-                Assert.IsTrue(problem.items[i].Weights >= 1 && problem.items[i].Weights <= 10);
-                Assert.IsTrue(problem.items[i].Values >= 1 && problem.items[i].Values <= 10);
-            }
-        }
 
         // Checking for negative Values or Weights
         [TestMethod]
@@ -146,8 +147,6 @@ namespace TestProject
                     new(2, -5, -6)
                 ]
             };
-
-            // Act
             problem.Solve(5);
 
             // Assert

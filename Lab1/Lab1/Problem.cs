@@ -13,7 +13,6 @@ namespace Lab1
     {
         public int n;
         public List<Item> items = [];
-        public List<Item> Result_List = [];
         public Result Result_obj;
 
         public Problem(int n, int seed = 1)
@@ -34,11 +33,10 @@ namespace Lab1
             if (capacity < 0)
                 capacity = 0;
 
-            List<Item> Sorted_list =  items.OrderBy(o => o.Ratio).ToList();
-            Sorted_list.Reverse();
-            items = Sorted_list;
             int tw = 0;
             int tv = 0;
+            List<Item> Result_List = [];
+            items = items.OrderByDescending(o => o.Ratio).ToList();
 
             foreach (Item item in items)
             {
