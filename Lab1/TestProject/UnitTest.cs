@@ -40,20 +40,20 @@ namespace TestProject
         [TestMethod]
         public void Test_Item_Order_Does_Not_Affect_Solution()
         {
-            Problem problem = new(5);
-            List<Item> originalList = new(problem.items);
+            Problem shuffleProblem = new(5);
+            Problem originalProblem = shuffleProblem;
 
-            // Shuffle the list of items
-            problem.items = problem.items.OrderBy(a => Guid.NewGuid()).ToList();
+            // Shuffle items
+            shuffleProblem.items = shuffleProblem.items.OrderBy(a => Guid.NewGuid()).ToList();
 
             // Solve the problem with the original and shuffled lists
-            Problem originalProblem = problem;
+            
             originalProblem.Solve(10);
 
-            problem.Solve(10);
+            shuffleProblem.Solve(10);
 
             // Assert
-            Assert.AreEqual(originalProblem.Result_List, problem.Result_List);
+            Assert.AreEqual(originalProblem.Result_List, shuffleProblem.Result_List);
         }
 
         [TestMethod]

@@ -15,50 +15,27 @@ namespace GUI
             int seed = 0;
             int capacity = 0;
 
-            if (int.TryParse(textBox1.Text, out int value) && value > 0)
+            if (int.TryParse(numericUpDown1.Text, out int value) && value > 0)
             {
                 n = value;
             }
-            else
-            {
-                textBox1.Clear();
-            }
-            if (int.TryParse(textBox2.Text, out value) && value > 0)
+            if (int.TryParse(numericUpDown2.Text, out value) && value > 0)
             {
                 seed = value;
             }
-            else
-            {
-                textBox2.Clear();
-            }
-            if (int.TryParse(textBox3.Text, out value) && value > 0)
+            if (int.TryParse(numericUpDown3.Text, out value) && value > 0)
             {
                 capacity = value;
-            }
-            else
-            {
-                textBox3.Clear();
             }
 
             Problem problem = new(n, seed);
 
             if (problem != null)
             {
-                string res = "";
                 problem.Solve(capacity);
-                listBox1.Items.Add("Total value: " + problem.Result_obj.Total_value);
-                listBox1.Items.Add("Total weight: " + problem.Result_obj.Total_weight);
-                for (int i = 0; i < problem.Result_obj.result.Count; i++)
-                {
-                    res += problem.Result_obj.result[i].Id + ", ";
-                }
-                listBox1.Items.Add("Items: " + res);
-                for (int i = 0; i < problem.items.Count; i++)
-                {
-                    listBox2.Items.Add(problem.items[i].ToString());
-                    
-                }
-
+                richTextBox1.Text = problem.Result_obj.ToString();
+                richTextBox2.Text = problem.ToString();
+                
             }
         }
     }

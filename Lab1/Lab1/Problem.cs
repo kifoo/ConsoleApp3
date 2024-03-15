@@ -31,6 +31,9 @@ namespace Lab1
 
         public void Solve(int capacity)
         {
+            if (capacity < 0)
+                capacity = 0;
+
             List<Item> Sorted_list =  items.OrderBy(o => o.Ratio).ToList();
             Sorted_list.Reverse();
             items = Sorted_list;

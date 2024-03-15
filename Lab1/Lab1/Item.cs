@@ -43,7 +43,7 @@ namespace Lab1
 
         public override string ToString()
         {
-            return "no.: " + Id + "\t value: " + Values + "\t weigth: " + Weights + "\n";
+            return "no.: " + Id + "\t value: " + Values + "  \t weigth: " + Weights + "\n";
         }
 
 
