@@ -30,7 +30,6 @@ namespace API_GUI
             modelBuilder.Entity<Characters_DB.Result_DB>().Property(c => c.gender).HasMaxLength(15);
             modelBuilder.Entity<Characters_DB.Result_DB>().Property(c => c.origin).HasMaxLength(255);
             modelBuilder.Entity<Characters_DB.Result_DB>().Property(c => c.location).HasMaxLength(255);
-            //modelBuilder.Entity<Characters_DB.Result_DB>().Property(c => c.image).HasMaxLength(255);
             modelBuilder.Entity<Characters_DB.Result_DB>().Property(c => c.url).HasMaxLength(255);
         }
     }

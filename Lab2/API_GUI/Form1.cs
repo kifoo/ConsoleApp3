@@ -46,21 +46,34 @@ namespace API_GUI
             }
         }
         /* Search button action */
-        private void characterButtonClick(object sender, EventArgs e)
+        private async void characterButtonClick(object sender, EventArgs e)
         {
-            GetCharacterDB();
-            if(characterDB.Count == 0)
+            try
             {
-                searchInfoLabel.Visible = true;
-                local = false;
-                SearchAPI();
-            }
-            else
-            {
+                searchInfoLabel.Visible = false;
+                GetCharacterDB();
                 local = true;
+                if (characterDB.Count == 0)
+                {
+                    searchInfoLabel.Visible = true;
+                    local = false;
+                    SearchAPI();
+                    if (character_API == null)
+                    {
+                        MessageBox.Show("No results found");
+                        return;
+                    }
+                }
+                else
+                {
+                    local = true;
+                }
+                CharacterAction();
             }
-            CharacterAction();
-            searchInfoLabel.Visible = false;
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
         /* Search for result through local database */
         private void GetCharacterDB()
@@ -96,7 +109,7 @@ namespace API_GUI
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
-                MessageBox.Show("Error: Could not connect to the database");
+                //MessageBox.Show("Error: Could not connect to the database");
             }
             
         }
@@ -107,7 +120,7 @@ namespace API_GUI
             {
                 string response = await client.GetStringAsync(GetCharacterURL());
                 character_API = JsonConvert.DeserializeObject<Character>(response);
-                if(character_API.results.Count == 0) { return; }
+                if(character_API.info.count == 0) { return; }
                 while (character_API.info.next != null)
                 {
                     response = await client.GetStringAsync(character_API.info.next);
@@ -119,7 +132,7 @@ namespace API_GUI
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
-                MessageBox.Show("Error: Could not connect to the API");
+                //MessageBox.Show("Error: Could not connect to the API");
             }
         }
         /* Create URL for the API search */
@@ -151,7 +164,7 @@ namespace API_GUI
             return url;
         }
         /* Display description and image of first element in the list */
-        private void CharacterAction()
+        private async void CharacterAction()
         {
             CreateCharacterList();
             character_description.Visible = true;
@@ -168,7 +181,7 @@ namespace API_GUI
             }
         }
         /* Create list of characters that meets the given requirements  */
-        private async void CreateCharacterList()
+        private void CreateCharacterList()
         {
             if (local)
             {
@@ -179,45 +192,35 @@ namespace API_GUI
             {
                 try
                 {
-                    if (character_API.results.Count != 0)
+                    foreach (Result result in character_API.results)
                     {
-                        foreach (Result result in character_API.results)
+                        Result_DB res = new()
                         {
-                            Result_DB res = new()
-                            {
-                                id = result.id,
-                                name = result.name,
-                                status = result.status.ToString(),
-                                species = result.species,
-                                type = result.type,
-                                gender = result.gender.ToString(),
-                                origin = result.origin.name,
-                                location = result.location.name,
-                                image = result.image,
-                                episode = result.episode,
-                                url = result.url,
-                                created = result.created,
-                            };
-                            if (db.Character.Any(c => c.id != res.id))
-                            {
-                                await db.Character.AddAsync(res);
-                                await db.SaveChangesAsync();
-                            }
+                            id = result.id,
+                            name = result.name,
+                            status = result.status.ToString(),
+                            species = result.species,
+                            type = result.type,
+                            gender = result.gender.ToString(),
+                            origin = result.origin.name,
+                            location = result.location.name,
+                            image = result.image,
+                            episode = result.episode,
+                            url = result.url,
+                            created = result.created,
+                        };
+                        if (db.Character.Any(c => c.id != res.id))
+                        {
+                            db.Character.Add(res);
+                            db.SaveChanges();
                         }
-                        db.SaveChanges();
                     }
+                    db.SaveChanges();
                 }
-                catch (Microsoft.EntityFrameworkCore.DbUpdateException ex)
+                catch (Exception ex)
                 {
-                    // Examine the inner exception
-                    if (ex.InnerException != null)
-                    {
-                        Console.WriteLine(ex.InnerException.Message);
-                    }
-                    else
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
+                    MessageBox.Show(ex.Message);
+                    //MessageBox.Show("Error: Could not connect to the database");
                 }
                 character_list.DisplayMember = "Name";
                 character_list.DataSource = character_API.results;
