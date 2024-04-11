@@ -36,8 +36,6 @@ namespace API_GUI
             character_box = new TextBox();
             Character_label = new Label();
             Gender_label = new Label();
-            RB_internet = new RadioButton();
-            RB_local = new RadioButton();
             picture_box = new PictureBox();
             type_box = new TextBox();
             character_list = new ListBox();
@@ -49,8 +47,7 @@ namespace API_GUI
             tableLayoutPanel1 = new TableLayoutPanel();
             gender_box = new ComboBox();
             status_box = new ComboBox();
-            previous_button = new Button();
-            next_button = new Button();
+            searchInfoLabel = new Label();
             ((System.ComponentModel.ISupportInitialize)picture_box).BeginInit();
             tableLayoutPanel1.SuspendLayout();
             SuspendLayout();
@@ -82,7 +79,7 @@ namespace API_GUI
             // buttonCharacter
             // 
             buttonCharacter.Font = new Font("Papyrus", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            buttonCharacter.Location = new Point(387, 348);
+            buttonCharacter.Location = new Point(465, 293);
             buttonCharacter.Margin = new Padding(3, 2, 3, 2);
             buttonCharacter.Name = "buttonCharacter";
             buttonCharacter.Size = new Size(204, 35);
@@ -120,32 +117,6 @@ namespace API_GUI
             Gender_label.TabIndex = 7;
             Gender_label.Text = "Gender";
             // 
-            // RB_internet
-            // 
-            RB_internet.AutoSize = true;
-            RB_internet.Font = new Font("Papyrus", 11F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            RB_internet.Location = new Point(387, 286);
-            RB_internet.Name = "RB_internet";
-            RB_internet.Size = new Size(239, 28);
-            RB_internet.TabIndex = 9;
-            RB_internet.Text = "Search trough internet database";
-            RB_internet.UseVisualStyleBackColor = true;
-            RB_internet.CheckedChanged += RadioButton_CheckedChanged;
-            // 
-            // RB_local
-            // 
-            RB_local.AutoSize = true;
-            RB_local.Checked = true;
-            RB_local.Font = new Font("Papyrus", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            RB_local.Location = new Point(387, 315);
-            RB_local.Name = "RB_local";
-            RB_local.Size = new Size(219, 28);
-            RB_local.TabIndex = 10;
-            RB_local.TabStop = true;
-            RB_local.Text = "Search trough local database";
-            RB_local.UseVisualStyleBackColor = true;
-            RB_local.CheckedChanged += RadioButton_CheckedChanged;
-            // 
             // picture_box
             // 
             picture_box.Location = new Point(783, 12);
@@ -171,11 +142,10 @@ namespace API_GUI
             character_list.FormattingEnabled = true;
             character_list.ItemHeight = 25;
             character_list.Location = new Point(29, 12);
-            character_list.MultiColumn = true;
             character_list.Name = "character_list";
-            character_list.Size = new Size(296, 502);
+            character_list.Size = new Size(320, 602);
             character_list.TabIndex = 14;
-            character_list.SelectedIndexChanged += character_list_SelectedIndexChanged;
+            character_list.SelectedIndexChanged += Character_list_SelectedIndexChanged;
             // 
             // Type_label
             // 
@@ -273,29 +243,16 @@ namespace API_GUI
             status_box.Size = new Size(204, 32);
             status_box.TabIndex = 23;
             // 
-            // previous_button
+            // searchInfoLabel
             // 
-            previous_button.Font = new Font("Papyrus", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            previous_button.Location = new Point(29, 520);
-            previous_button.Name = "previous_button";
-            previous_button.Size = new Size(72, 31);
-            previous_button.TabIndex = 21;
-            previous_button.Text = "Prev";
-            previous_button.UseVisualStyleBackColor = true;
-            previous_button.Visible = false;
-            previous_button.Click += PrevPageButtonClick;
-            // 
-            // next_button
-            // 
-            next_button.Font = new Font("Papyrus", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            next_button.Location = new Point(253, 520);
-            next_button.Name = "next_button";
-            next_button.Size = new Size(72, 31);
-            next_button.TabIndex = 22;
-            next_button.Text = "Next";
-            next_button.UseVisualStyleBackColor = true;
-            next_button.Visible = false;
-            next_button.Click += NextPageButtonClick;
+            searchInfoLabel.AutoSize = true;
+            searchInfoLabel.Font = new Font("Papyrus", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            searchInfoLabel.Location = new Point(419, 350);
+            searchInfoLabel.Name = "searchInfoLabel";
+            searchInfoLabel.Size = new Size(278, 25);
+            searchInfoLabel.TabIndex = 21;
+            searchInfoLabel.Text = "Changed search from database to API";
+            searchInfoLabel.Visible = false;
             // 
             // Form1
             // 
@@ -303,13 +260,10 @@ namespace API_GUI
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.SeaGreen;
             ClientSize = new Size(1201, 650);
-            Controls.Add(next_button);
-            Controls.Add(previous_button);
+            Controls.Add(searchInfoLabel);
             Controls.Add(tableLayoutPanel1);
             Controls.Add(Search_label);
             Controls.Add(character_list);
-            Controls.Add(RB_local);
-            Controls.Add(RB_internet);
             Controls.Add(picture_box);
             Controls.Add(character_description);
             Controls.Add(Title);
@@ -334,8 +288,6 @@ namespace API_GUI
         private Label Gender_label;
         private TextBox character_box;
         private PictureBox picture_box;
-        private RadioButton RB_internet;
-        private RadioButton RB_local;
         private TextBox type_box;
         private ListBox character_list;
         private Label Type_label;
@@ -346,7 +298,6 @@ namespace API_GUI
         private TableLayoutPanel tableLayoutPanel1;
         private ComboBox gender_box;
         private ComboBox status_box;
-        private Button previous_button;
-        private Button next_button;
+        private Label searchInfoLabel;
     }
 }

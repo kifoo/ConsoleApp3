@@ -48,44 +48,57 @@ namespace API_GUI
         /* Search button action */
         private void characterButtonClick(object sender, EventArgs e)
         {
-            if (local == true)
+            GetCharacterDB();
+            if(characterDB.Count == 0)
             {
-                GetCharacterDB();
-                CharacterAction();
+                searchInfoLabel.Visible = true;
+                local = false;
+                SearchAPI();
             }
             else
             {
-                SearchAPI();
+                local = true;
             }
+            CharacterAction();
+            searchInfoLabel.Visible = false;
         }
         /* Search for result through local database */
         private void GetCharacterDB()
         {
-            var query = db.Character.AsQueryable();
+            try
+            {
+                var query = db.Character.AsQueryable();
+
+                if (!string.IsNullOrEmpty(character_box.Text))
+                {
+                    query = query.Where(c => c.name.Contains(character_box.Text));
+                }
+                if (status_box.SelectedItem != null)
+                {
+                    Status selectedStatus = (Status)status_box.SelectedItem;
+                    query = query.Where(c => c.status.Contains(selectedStatus.ToString()));
+                }
+                if (!string.IsNullOrEmpty(species_box.Text))
+                {
+                    query = query.Where(c => c.species.Contains(species_box.Text));
+                }
+                if (!string.IsNullOrEmpty(type_box.Text))
+                {
+                    query = query.Where(c => c.type.Contains(type_box.Text));
+                }
+                if (gender_box.SelectedItem != null)
+                {
+                    Gender selectedGender = (Gender)gender_box.SelectedItem;
+                    query = query.Where(c => c.gender.Contains(selectedGender.ToString()));
+                }
+                characterDB = query.ToList();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                MessageBox.Show("Error: Could not connect to the database");
+            }
             
-            if ( !string.IsNullOrEmpty(character_box.Text))
-            {
-                query = query.Where(c => c.name.Contains(character_box.Text));
-            }
-            if (status_box.SelectedItem != null)
-            {
-                Status selectedStatus = (Status)status_box.SelectedItem;
-                query = query.Where(c => c.status.Contains(selectedStatus.ToString()));
-            }
-            if (!string.IsNullOrEmpty(species_box.Text))
-            {
-                query = query.Where(c => c.species.Contains(species_box.Text));
-            }
-            if (!string.IsNullOrEmpty(type_box.Text))
-            {
-                query = query.Where(c => c.type.Contains(type_box.Text));
-            }
-            if (gender_box.SelectedItem != null)
-            {
-                Gender selectedGender = (Gender)gender_box.SelectedItem;
-                query = query.Where(c => c.gender.Contains(selectedGender.ToString()));
-            }
-            characterDB = query.ToList();
         }
         /* Search for result through API */
         private async void SearchAPI()
@@ -93,14 +106,20 @@ namespace API_GUI
             try
             {
                 string response = await client.GetStringAsync(GetCharacterURL());
-                if (response == null) { return; }
                 character_API = JsonConvert.DeserializeObject<Character>(response);
-                next_button.Visible = (character_API.info.next != null);
-                CharacterAction();
+                if(character_API.results.Count == 0) { return; }
+                while (character_API.info.next != null)
+                {
+                    response = await client.GetStringAsync(character_API.info.next);
+                    Character nextPage = JsonConvert.DeserializeObject<Character>(response);
+                    character_API.results.AddRange(nextPage.results);
+                    character_API.info.next = nextPage.info.next;
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+                MessageBox.Show("Error: Could not connect to the API");
             }
         }
         /* Create URL for the API search */
@@ -134,9 +153,9 @@ namespace API_GUI
         /* Display description and image of first element in the list */
         private void CharacterAction()
         {
+            CreateCharacterList();
             character_description.Visible = true;
             picture_box.SizeMode = PictureBoxSizeMode.Zoom;
-            CreateCharacterList();
             if (local)
             {
                 character_description.Text = characterDB[0].ToString();
@@ -148,52 +167,45 @@ namespace API_GUI
                 picture_box.Load(character_API.results[0].image);
             }
         }
-        /* Create Result_DB from Result */
-        private Result_DB API_to_DB(Result result) 
-        {
-            Result_DB res = new Result_DB();
-            res.id = result.id;
-            res.name = result.name;
-            res.status = result.status;
-            res.species = result.species;
-            res.type = result.type;
-            res.gender = result.gender;
-            res.origin = result.origin.name;
-            res.location = result.location.name;
-            res.image = result.image;
-            res.episode = result.episode;
-            res.url = result.url;
-            res.created = result.created;
-            return res;
-             
-        }   
         /* Create list of characters that meets the given requirements  */
         private async void CreateCharacterList()
         {
             if (local)
             {
-                character_list.DataSource = characterDB;
                 character_list.DisplayMember = "Name";
+                character_list.DataSource = characterDB;
             }
             else
             {
                 try
                 {
-                    foreach (Result result in character_API.results)
+                    if (character_API.results.Count != 0)
                     {
-                        Result_DB res = API_to_DB(result);
-                        if( db.Character.Count() <= 0)
+                        foreach (Result result in character_API.results)
                         {
-                            await db.Character.AddAsync(res);
-                            await db.SaveChangesAsync();
+                            Result_DB res = new()
+                            {
+                                id = result.id,
+                                name = result.name,
+                                status = result.status.ToString(),
+                                species = result.species,
+                                type = result.type,
+                                gender = result.gender.ToString(),
+                                origin = result.origin.name,
+                                location = result.location.name,
+                                image = result.image,
+                                episode = result.episode,
+                                url = result.url,
+                                created = result.created,
+                            };
+                            if (db.Character.Any(c => c.id != res.id))
+                            {
+                                await db.Character.AddAsync(res);
+                                await db.SaveChangesAsync();
+                            }
                         }
-                        else if ( db.Character.Any(c => c.id != res.id))
-                        {
-                            await db.Character.AddAsync(res);
-                            await db.SaveChangesAsync();
-                        }
+                        db.SaveChanges();
                     }
-                    db.SaveChanges();
                 }
                 catch (Microsoft.EntityFrameworkCore.DbUpdateException ex)
                 {
@@ -207,36 +219,12 @@ namespace API_GUI
                         Console.WriteLine(ex.Message);
                     }
                 }
-                character_list.DataSource = character_API.results;
                 character_list.DisplayMember = "Name";
+                character_list.DataSource = character_API.results;
             }
         }
-        
-        /* API search for next page characters */
-        private async void NextPageButtonClick(object sender, EventArgs e)
-        {
-            string nextPageItems = await client.GetStringAsync(character_API.info.next);
-            character_API = JsonConvert.DeserializeObject<Character>(nextPageItems);
-
-            next_button.Visible = (character_API.info.next != null);
-            previous_button.Visible = (character_API.info.prev != null);
-            
-            CreateCharacterList();
-        }
-        /* API search for previous page characters */
-        private async void PrevPageButtonClick(object sender, EventArgs e)
-        {
-            string nextPageItems = await client.GetStringAsync((string?)character_API.info.prev);
-            character_API = JsonConvert.DeserializeObject<Character>(nextPageItems);
-
-            next_button.Visible = (character_API.info.next != null);
-            previous_button.Visible = (character_API.info.prev != null);
-
-            CreateCharacterList();
-        }
-
-        /* Display description and image of selected character */
-        private void character_list_SelectedIndexChanged(object sender, EventArgs e)
+        /* Display selected character description and image */
+        private void Character_list_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (local)
             {
@@ -250,27 +238,6 @@ namespace API_GUI
                 character_description.Text = selectedResult?.ToString();
                 picture_box.Load(selectedResult?.image);
             }            
-        }
-        /* Selection of search type */
-        private void RadioButton_CheckedChanged(object sender, EventArgs e)
-        {
-            RadioButton radioButton = (RadioButton)sender;
-
-            if (radioButton.Checked)
-            {
-                if (radioButton == RB_internet)
-                {
-                    RB_local.Checked = false;
-                    local = false;
-                    // Internet search is selected
-                }
-                else if (radioButton == RB_local)
-                {
-                    RB_internet.Checked = false;
-                    local = true;
-                    // Local search is selected
-                }
-            }
         }
     }
 }

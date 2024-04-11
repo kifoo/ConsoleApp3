@@ -28,10 +28,10 @@ namespace API_GUI.Elements
         {
             public int id { get; set; }
             public string name { get; set; }
-            public string status { get; set; }
+            public Status status { get; set; }
             public string species { get; set; }
             public string type { get; set; }
-            public string gender { get; set; }
+            public Gender gender { get; set; }
             public OriginLocation origin { get; set; }
             public ActualLocation location { get; set; }
             public string image { get; set; }

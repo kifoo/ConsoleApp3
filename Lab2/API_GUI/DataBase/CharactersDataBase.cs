@@ -18,6 +18,7 @@ namespace API_GUI
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
             options.UseSqlite(@"Data Source=characters.db");
+            options.EnableSensitiveDataLogging();
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
