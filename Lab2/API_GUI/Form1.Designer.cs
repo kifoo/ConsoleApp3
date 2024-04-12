@@ -48,6 +48,8 @@ namespace API_GUI
             gender_box = new ComboBox();
             status_box = new ComboBox();
             searchInfoLabel = new Label();
+            moreCharactersAPI = new Button();
+            CharacterCount = new Label();
             ((System.ComponentModel.ISupportInitialize)picture_box).BeginInit();
             tableLayoutPanel1.SuspendLayout();
             SuspendLayout();
@@ -141,7 +143,7 @@ namespace API_GUI
             character_list.Font = new Font("Papyrus", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             character_list.FormattingEnabled = true;
             character_list.ItemHeight = 25;
-            character_list.Location = new Point(29, 12);
+            character_list.Location = new Point(30, 12);
             character_list.Name = "character_list";
             character_list.Size = new Size(320, 602);
             character_list.TabIndex = 14;
@@ -247,12 +249,36 @@ namespace API_GUI
             // 
             searchInfoLabel.AutoSize = true;
             searchInfoLabel.Font = new Font("Papyrus", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            searchInfoLabel.Location = new Point(419, 350);
+            searchInfoLabel.Location = new Point(419, 405);
             searchInfoLabel.Name = "searchInfoLabel";
             searchInfoLabel.Size = new Size(278, 25);
             searchInfoLabel.TabIndex = 21;
             searchInfoLabel.Text = "Changed search from database to API";
             searchInfoLabel.Visible = false;
+            // 
+            // moreCharactersAPI
+            // 
+            moreCharactersAPI.Font = new Font("Papyrus", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            moreCharactersAPI.Location = new Point(465, 346);
+            moreCharactersAPI.Margin = new Padding(3, 2, 3, 2);
+            moreCharactersAPI.Name = "moreCharactersAPI";
+            moreCharactersAPI.Size = new Size(204, 35);
+            moreCharactersAPI.TabIndex = 22;
+            moreCharactersAPI.Text = "Search through API";
+            moreCharactersAPI.UseVisualStyleBackColor = true;
+            moreCharactersAPI.Visible = false;
+            moreCharactersAPI.Click += searchAPIButton_Click;
+            // 
+            // CharacterCount
+            // 
+            CharacterCount.AutoSize = true;
+            CharacterCount.Font = new Font("Papyrus", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            CharacterCount.Location = new Point(69, 617);
+            CharacterCount.Name = "CharacterCount";
+            CharacterCount.Size = new Size(241, 25);
+            CharacterCount.TabIndex = 23;
+            CharacterCount.Text = "Found XXXX maching characters.";
+            CharacterCount.Visible = false;
             // 
             // Form1
             // 
@@ -260,6 +286,8 @@ namespace API_GUI
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.SeaGreen;
             ClientSize = new Size(1201, 650);
+            Controls.Add(CharacterCount);
+            Controls.Add(moreCharactersAPI);
             Controls.Add(searchInfoLabel);
             Controls.Add(tableLayoutPanel1);
             Controls.Add(Search_label);
@@ -299,5 +327,7 @@ namespace API_GUI
         private ComboBox gender_box;
         private ComboBox status_box;
         private Label searchInfoLabel;
+        private Button moreCharactersAPI;
+        private Label CharacterCount;
     }
 }

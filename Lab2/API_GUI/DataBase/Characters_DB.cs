@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static API_GUI.Elements.Characters;
-using API_GUI.Enums;
 
-namespace API_GUI
+namespace API_GUI.DataBase
 {
     internal class Characters_DB
     {
         public class Result_DB
         {
+            public int Key { get; set; }
             public int id { get; set; }
             public string name { get; set; }
             public string status { get; set; }
@@ -32,7 +31,7 @@ namespace API_GUI
                 {
                     s += $"Type: \t\t{type}\n";
                 }
-                s += $"Origin location: \t\t{origin}\nLast known location: \t\t{location}\nEpisodes: \t\t{episode.Count}\n";
+                s += $"Origin location: \t{origin}\nLast known location: \t{location}\nEpisode count: \t\t{episode.Count}\n";
                 return s;
             }
         }

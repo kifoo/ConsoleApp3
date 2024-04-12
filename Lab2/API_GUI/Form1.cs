@@ -2,19 +2,21 @@ using Newtonsoft.Json;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Text;
 using System.Net;
-using API_GUI.Elements;
-using API_GUI.Enums;
-using static API_GUI.Elements.Characters;
 using System.Windows.Forms;
 using System.Security.Policy;
 using System.Linq;
-using static API_GUI.Characters_DB;
+using API_GUI.API;
+using API_GUI.Enums;
+using static API_GUI.API.Characters;
+using API_GUI.DataBase;
+using static API_GUI.DataBase.Characters_DB;
 using System.Data.Common;
 
 namespace API_GUI
 {
     public partial class Form1 : Form
     {
+        private const string errorMessage = $"{{\"error\":\"There is nothing here\"}}";
         Character character_API;
         private string base_url = "https://rickandmortyapi.com/api/";
         private HttpClient client;
@@ -22,10 +24,12 @@ namespace API_GUI
         private bool local = true;
         private CharactersDataBase db;
         List<Result_DB> characterDB;
+        string url = "";
 
         public Form1()
         {
             InitializeComponent();
+            character_API = new Character();
             db = new CharactersDataBase();
             client = new HttpClient();
 
@@ -50,77 +54,90 @@ namespace API_GUI
         {
             try
             {
+                moreCharactersAPI.Visible = false;
                 searchInfoLabel.Visible = false;
-                GetCharacterDB();
+                url = GetCharacter();
                 local = true;
-                if (characterDB.Count == 0)
+                if (characterDB == null || characterDB.Count == 0)
                 {
                     searchInfoLabel.Visible = true;
                     local = false;
-                    SearchAPI();
-                    if (character_API == null)
+                    bool success = await SearchAPI(url);
+                    if (success)
                     {
-                        MessageBox.Show("No results found");
-                        return;
+                        CharacterAction();
                     }
                 }
                 else
                 {
                     local = true;
+                    CharacterAction();
+                    moreCharactersAPI.Visible = true;
                 }
-                CharacterAction();
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.Message + "\ncharacterButtonClick");
             }
         }
-        /* Search for result through local database */
-        private void GetCharacterDB()
+        /* Search for result through local database and create a url if needed */
+        private string GetCharacter()
         {
             try
             {
                 var query = db.Character.AsQueryable();
+                url = base_url + $"character/?";
 
                 if (!string.IsNullOrEmpty(character_box.Text))
                 {
                     query = query.Where(c => c.name.Contains(character_box.Text));
+                    url += $"&name={character_box.Text}";
                 }
                 if (status_box.SelectedItem != null)
                 {
                     Status selectedStatus = (Status)status_box.SelectedItem;
                     query = query.Where(c => c.status.Contains(selectedStatus.ToString()));
+                    url += $"&status={selectedStatus}";
                 }
                 if (!string.IsNullOrEmpty(species_box.Text))
                 {
                     query = query.Where(c => c.species.Contains(species_box.Text));
+                    url += $"&species={species_box.Text}";
                 }
                 if (!string.IsNullOrEmpty(type_box.Text))
                 {
                     query = query.Where(c => c.type.Contains(type_box.Text));
+                    url += $"&type={type_box.Text}";
                 }
                 if (gender_box.SelectedItem != null)
                 {
                     Gender selectedGender = (Gender)gender_box.SelectedItem;
                     query = query.Where(c => c.gender.Contains(selectedGender.ToString()));
+                    url += $"&gender={selectedGender}";
                 }
                 characterDB = query.ToList();
+
+                return url;
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
-                //MessageBox.Show("Error: Could not connect to the database");
+                MessageBox.Show(ex.Message + "\nGetCharacterDB");
+                return url;
             }
             
         }
         /* Search for result through API */
-        private async void SearchAPI()
+        private async Task<bool> SearchAPI(string url)
         {
             try
             {
-                string response = await client.GetStringAsync(GetCharacterURL());
+                string response = await client.GetStringAsync(url);
+                if (response == errorMessage)
+                {
+                    MessageBox.Show("No items found.");
+                    return false;
+                }
                 character_API = JsonConvert.DeserializeObject<Character>(response);
-                if(character_API.info.count == 0) { return; }
                 while (character_API.info.next != null)
                 {
                     response = await client.GetStringAsync(character_API.info.next);
@@ -128,43 +145,17 @@ namespace API_GUI
                     character_API.results.AddRange(nextPage.results);
                     character_API.info.next = nextPage.info.next;
                 }
+                return true;
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
-                //MessageBox.Show("Error: Could not connect to the API");
+                MessageBox.Show(ex.Message + "\n\nNo items found.\n\nSearchAPI");
+                return false;
             }
         }
-        /* Create URL for the API search */
-        private string GetCharacterURL()
-        {
-            string url = base_url + $"character/?";
-            if (character_box.Text != "" && character_box.Text != null)
-            {
-                url += $"&name={character_box.Text}";
-            }
-            if (status_box.SelectedItem != null)
-            {
-                Status selectedStatus = (Status)status_box.SelectedItem;
-                url += $"&status={selectedStatus}";
-            }
-            if (species_box.Text != "" && species_box.Text != null)
-            {
-                url += $"&species={species_box.Text}";
-            }
-            if (type_box.Text != "" && type_box.Text != null)
-            {
-                url += $"&type={type_box.Text}";
-            }
-            if (gender_box.SelectedItem != null)
-            {
-                Gender selectedGender = (Gender)gender_box.SelectedItem;
-                url += $"&gender={selectedGender}";
-            }
-            return url;
-        }
+       
         /* Display description and image of first element in the list */
-        private async void CharacterAction()
+        private void CharacterAction()
         {
             CreateCharacterList();
             character_description.Visible = true;
@@ -187,43 +178,51 @@ namespace API_GUI
             {
                 character_list.DisplayMember = "Name";
                 character_list.DataSource = characterDB;
+                CharacterCount.Visible = true;
+                CharacterCount.Text = $"Found {characterDB.Count} maching characters.";
             }
             else
             {
-                try
+                if (true)
                 {
-                    foreach (Result result in character_API.results)
+                    try
                     {
-                        Result_DB res = new()
+
+                        foreach (Result result in character_API.results)
                         {
-                            id = result.id,
-                            name = result.name,
-                            status = result.status.ToString(),
-                            species = result.species,
-                            type = result.type,
-                            gender = result.gender.ToString(),
-                            origin = result.origin.name,
-                            location = result.location.name,
-                            image = result.image,
-                            episode = result.episode,
-                            url = result.url,
-                            created = result.created,
-                        };
-                        if (db.Character.Any(c => c.id != res.id))
-                        {
-                            db.Character.Add(res);
-                            db.SaveChanges();
+                            if (!db.Character.Any(c => c.id == result.id))
+                            {
+                                Result_DB res = new()
+                                {
+                                    id = result.id,
+                                    name = result.name,
+                                    status = result.status.ToString(),
+                                    species = result.species,
+                                    type = result.type,
+                                    gender = result.gender.ToString(),
+                                    origin = result.origin.name,
+                                    location = result.location.name,
+                                    image = result.image,
+                                    episode = result.episode,
+                                    url = result.url,
+                                    created = result.created,
+                                };
+                                db.Character.Add(res);
+                                db.SaveChanges();
+                            }
                         }
+                        db.SaveChanges();
                     }
-                    db.SaveChanges();
+
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message + "\nCreateCharacterList");
+                    }
+                    character_list.DisplayMember = "Name";
+                    character_list.DataSource = character_API.results;
+                    CharacterCount.Visible = true;
+                    CharacterCount.Text = $"Found {character_API.results.Count} maching characters.";
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                    //MessageBox.Show("Error: Could not connect to the database");
-                }
-                character_list.DisplayMember = "Name";
-                character_list.DataSource = character_API.results;
             }
         }
         /* Display selected character description and image */
@@ -231,16 +230,33 @@ namespace API_GUI
         {
             if (local)
             {
-                Result_DB selectedResult = (Result_DB)character_list.SelectedItem;
+                Result_DB? selectedResult = character_list.SelectedItem as Result_DB;
                 character_description.Text = selectedResult?.ToString();
                 picture_box.Load(selectedResult?.image);
             }
             else
             {
-                Result selectedResult = (Result)character_list.SelectedItem;
+                Result? selectedResult = character_list.SelectedItem as Result;
                 character_description.Text = selectedResult?.ToString();
                 picture_box.Load(selectedResult?.image);
             }            
+        }
+        /* API Search */
+        private async void searchAPIButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                local = false;
+                bool success = await SearchAPI(url);
+                if (success)
+                {
+                    CharacterAction();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + "\nsearchAPIButton_Click");
+            }
         }
     }
 }

@@ -8,7 +8,7 @@ using System.Xml.Linq;
 using API_GUI.Enums;
 using Newtonsoft.Json;
 
-namespace API_GUI.Elements
+namespace API_GUI.API
 {
     internal class Characters
     {
@@ -46,7 +46,7 @@ namespace API_GUI.Elements
                 {
                     s += $"Type: \t\t{type}\n";
                 }
-                s += $"Origin location: \t\t{origin.name}\nLast known location: \t\t{location.name}\nEpisodes: \t\t{episode.Count}\n";
+                s += $"Origin location: \t{origin.name}\nLast known location: \t{location.name}\nEpisode count: \t\t{episode.Count}\n";
                 return s;
             }
         }

@@ -15,8 +15,9 @@ namespace API_GUI.Migrations
                 name: "Character",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", false),
+                    Key = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    id = table.Column<int>(type: "INTEGER", nullable: false),
                     name = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
                     status = table.Column<string>(type: "TEXT", maxLength: 15, nullable: false),
                     species = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
@@ -31,7 +32,7 @@ namespace API_GUI.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Character", x => x.id);
+                    table.PrimaryKey("PK_Character", x => x.Key);
                 });
         }
 
