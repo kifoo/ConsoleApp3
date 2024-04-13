@@ -61,11 +61,7 @@ namespace API_GUI.API
             public string name { get; set; }
             public string url { get; set; }
         }
-
-
-
     }
-
 }
 
         

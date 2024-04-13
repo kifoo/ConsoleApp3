@@ -9,7 +9,6 @@ namespace API_GUI.DataBase
 {
     internal class CharactersDataBase : DbContext
     {
-        // DbContextOptionsBuilder.EnableSensitiveDataLogging 
         public DbSet<Characters_DB.Result_DB> Character { get; set; }
         public CharactersDataBase()
         {
