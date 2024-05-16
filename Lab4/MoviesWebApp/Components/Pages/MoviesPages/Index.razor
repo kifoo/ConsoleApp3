@@ -1,0 +1,90 @@
+﻿@page "/movies"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject MoviesWebApp.Components.DataBase.MoviesDB DB
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.EntityFrameworkCore.Infrastructure
+@using MoviesWebApp.Components.DataBase
+
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>Movies</PageTitle>
+
+<h1>Movies</h1>
+
+<AuthorizeView>
+    <Authorized>
+        <p>
+            <a href="movies/create">Create New</a>
+        </p>
+    </Authorized>
+</AuthorizeView>
+
+@if (movies == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Genre</th>
+                <th>Year</th>
+                <th>Rating</th>
+                <th> </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var movie in movies)
+            {
+                var userRating = GetUserRating(movie, userName);
+                <tr>
+                    <td>@movie.Title</td>
+                    <td>@movie.Genre</td>
+                    <td>@movie.Year</td>
+                    <td>@movie.Rating</td>
+                    <td>
+                        <a href="@($"movies/details?id={movie.Id}")">Details</a>
+                        <AuthorizeView>
+                            <Authorized>
+                                @if (userRating is null)
+                                {
+                                    <text> | </text>
+                                    <a href="@($"movies/add-rating?id={movie.Id}")">Add Rating</a>
+                                }
+                            </Authorized>
+                        </AuthorizeView>
+                    </td>
+                </tr>
+                
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    public string userName { get; set; }
+    public List<Movies> movies { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        userName = authState.User.Identity!.Name!;
+
+        movies = await DB.Movies.ToListAsync();
+    }
+
+    public Rating GetUserRating(Movies movie, string userId)
+    {
+        List<Rating> ratings = DB.Ratings.Where(r => r.MovieId == movie.Id).ToList();
+
+        Rating userRating = null;
+
+        if (ratings is not null)
+        {
+            userRating = ratings.FirstOrDefault(r => r.UserId == userId);
+        }
+        return userRating;
+    }
+}

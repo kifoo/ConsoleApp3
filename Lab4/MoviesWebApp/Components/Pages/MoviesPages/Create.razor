@@ -1,0 +1,141 @@
+﻿@page "/movies/create"
+@inject MoviesWebApp.Components.DataBase.MoviesDB DB
+@inject MoviesWebApp.Data.ApplicationDbContext Context
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+
+@using Microsoft.EntityFrameworkCore
+@using MoviesWebApp.Components.DataBase
+
+
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h4>Movies</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Movie" OnValidSubmit="AddMovies" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />     
+            <div class="mb-3">
+                <label for="title" class="form-label">Title:</label> 
+                <InputText id="title" @bind-Value="Movie.Title" class="form-control" /> 
+                <ValidationMessage For="() => Movie.Title" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="genre" class="form-label">Genre:</label> 
+                <InputText id="genre" @bind-Value="Movie.Genre" class="form-control" /> 
+                <ValidationMessage For="() => Movie.Genre" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="year" class="form-label">Year:</label> 
+                <InputNumber id="year" @bind-Value="Movie.Year" class="form-control" /> 
+                <ValidationMessage For="() => Movie.Year" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="rating" class="form-label">Rating:</label> 
+                <InputNumber id="rating" @bind-Value="Movie.Rating" class="form-control" /> 
+                <ValidationMessage For="() => Movie.Rating" class="text-danger" /> 
+            </div> 
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+        @* <div class="mb-3">
+            <label class="form-label">Image:</label>
+            <InputFile OnChange="@OnImageChanged"/>
+        </div> *@
+    </div>
+</div>
+
+<div>
+    <a href="/movies">Back to List</a>
+</div>
+
+@code {
+
+    [SupplyParameterFromForm]
+    public Movies Movie { get; set; } = new();
+
+    private Movies movie;
+
+    protected override async Task OnInitializedAsync()
+    {
+        movie = new Movies();
+    }
+
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    public async Task AddMovies()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        string userName = authState.User.Identity.Name;
+
+        Movie.UserId = userName;
+        Movie.Rating = Math.Round((double)Movie.Rating, 2);
+        DB.Movies.Add(Movie);
+        await DB.SaveChangesAsync();
+
+        Movie = await DB.Movies.FirstOrDefaultAsync(m => m.Title == Movie.Title);
+
+        Rating Rating = new Rating();
+        Rating.MovieId = Movie.Id;
+        Rating.UserId = userName;
+        Rating.Value = Math.Round((double)Movie.Rating, 2);
+        DB.Ratings.Add(Rating);
+        await DB.SaveChangesAsync();
+        NavigationManager.NavigateTo("/movies");
+    }
+
+    // private async Task OnImageChanged(InputFileChangeEventArgs e)
+    // {
+    //     if (e.File.Size > 0)
+    //     {
+    //         using var stream = new MemoryStream();
+    //         await e.File.OpenReadStream().CopyToAsync(stream);
+    //         Movie.Image = stream.ToArray();
+    //         DB.Attach(Movie).State = EntityState.Modified;
+    //         await DB.SaveChangesAsync();
+    //     }
+    // }
+
+    // private async Task OnImageChanged(InputFileChangeEventArgs e)
+    // {
+    //     using var content = new MultipartFormDataContent();
+
+    //     foreach(var file in e.GetMultipleFiles(maxAllowedFiles))
+    //     {
+    //         var fileContent = new StreamContent(file.OpenReadStream(maxFileSize));
+    //         fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
+
+    //         uploadedFiles.Add(file.Name);
+
+    //         content.Add(
+    //             content: fileContent,
+    //             name: "\"files\"",
+    //             fileName: file.Name
+    //         );
+
+    //         var response = await Http.PostAsync("api/File", content);
+    //         var newUploadResult = await response.Content.ReadFromJsonAsync<List<UploadResult>>();
+
+    //         if(newUploadResult is not null)
+    //         {
+    //             uploadResults = uploadResults.Concat(newUploadResult).ToList();
+    //         }
+
+    //         DB.Images.Add(uploadResults.First());
+    //         await DB.SaveChangesAsync();
+    //     }       
+    // }
+
+    // private string? GetStoredFileName(string fileName)
+    // {
+    //     var uploadResult = uploadResults.SingleOrDefault(f => f.FileName == fileName);
+    //     if (uploadResult is not null)
+    //     {
+    //         return uploadResult.StoredFileName;
+    //     }
+    //     return "File not found.";
+    // }
+}

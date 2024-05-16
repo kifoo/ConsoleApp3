@@ -1,0 +1,130 @@
+﻿@page "/Movies/edit"
+@inject MoviesWebApp.Components.DataBase.MoviesDB DB
+@using MoviesWebApp.Components.DataBase
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>Movies</h4>
+<hr />
+@if (movie is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="movie" OnValidSubmit="UpdateMovies" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <input type="hidden" name="Movies.Id" value="@movie.Id" />
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title:</label>
+                    <InputText id="title" @bind-Value="movie.Title" class="form-control" />
+                    <ValidationMessage For="() => movie.Title" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="genre" class="form-label">Genre:</label>
+                    <InputText id="genre" @bind-Value="movie.Genre" class="form-control" />
+                    <ValidationMessage For="() => movie.Genre" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="year" class="form-label">Year:</label>
+                    <InputNumber id="year" @bind-Value="movie.Year" class="form-control" />
+                    <ValidationMessage For="() => movie.Year" class="text-danger" />
+                </div>
+                @* <div class="mb-3">
+                    <label for="image" class="form-label">Image:</label>
+                    <InputFile id="image" OnChange="@OnImageChanged" class="form-control" />
+                </div> *@
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/movies">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    public Movies? movie { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        movie ??= await DB.Movies.FirstOrDefaultAsync(m => m.Id == Id);
+        movie!.UserId = (await AuthStateProvider.GetAuthenticationStateAsync()).User.Identity.Name;
+        movie!.Id = Id;
+
+        List<Rating> ratings = DB.Ratings.Where(r => r.MovieId == movie.Id).ToList();
+        if (ratings.Count > 0)
+        {
+            double totalRating = 0;
+            foreach (var rating in ratings)
+            {
+                totalRating += rating.Value;
+            }
+            movie!.Rating = Math.Round((double)totalRating / ratings.Count, 2);
+        }
+
+        if (movie is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateMovies()
+    {
+        DB.Attach(movie!).State = EntityState.Modified;
+
+        try
+        {
+            await DB.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!MoviesExists(movie!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/movies");
+    }
+
+    // private async Task OnImageChanged(InputFileChangeEventArgs e)
+    // {
+    //     var file = e.File;
+
+    //     byte[] fileContent = new byte[file.Size];
+    //     var result = await file.OpenReadStream(file.Size).ReadAsync(fileContent, 0, (Int32)file.Size);
+    //     movie.Image = "data:image/png;base64," + Convert.ToBase64String(fileContent);
+    //     // // Convert the file to a byte array
+    //     // using var ms = new MemoryStream();
+    //     // await file.OpenReadStream().CopyToAsync(ms);
+    //     // movie.Image = ms.ToArray();
+
+    //     DB.Attach(movie!).State = EntityState.Modified;
+    //     await DB.SaveChangesAsync();
+    // }
+
+    bool MoviesExists(int id)
+    {
+        return DB.Movies.Any(e => e.Id == id);
+    }
+}

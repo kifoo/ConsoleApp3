@@ -1,0 +1,89 @@
+﻿@page "/ratings"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject MoviesWebApp.Components.DataBase.MoviesDB DB
+@using Microsoft.EntityFrameworkCore
+@using MoviesWebApp.Components.DataBase
+
+@inject AuthenticationStateProvider AuthStateProvider
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+
+<PageTitle>My Ratings</PageTitle>
+
+<h1>My Ratings</h1>
+
+
+@if (movies == null)
+{
+    <p><em>You have not rate anything. Start rating movies to see your ratings.</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Genre</th>
+                <th>Year</th>
+                <th>Rating</th>
+                <th>My rating</th>
+                <th> </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var movie in movies)
+            {
+                var userRating = GetUserRating(userName!, movie!);
+                <tr>
+                    <td>@movie.Title</td>
+                    <td>@movie.Genre</td>
+                    <td>@movie.Year</td>
+                    <td>@movie.Rating</td>
+                    <td>@userRating.Value</td>
+                    <td><a href="@($"ratings/edit?id={userRating.Id}")">Edit</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    List<Movies> movies;
+    string? userName;
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        userName = authState.User.Identity.Name;
+        
+        movies = new List<Movies>();
+        List<Rating> Ratings = await DB.Ratings.Where(r => r.UserId == userName).ToListAsync();
+
+        if(Ratings.Any()){
+            foreach(var rating in Ratings)
+            {
+                Movies movie = await DB.Movies.FirstOrDefaultAsync(m => rating.MovieId == m.Id);
+                if(movie != null)
+                {
+                    movies.Add(movie);
+                }
+            }
+        }
+        else
+        {
+            movies = null;
+        }
+    }
+
+    public Rating GetUserRating(string userId, Movies Movie)
+    {
+        List<Rating> Ratings = DB.Ratings.Where(r => r.MovieId == Movie.Id).ToList();
+        foreach (var rating in Ratings)
+        {
+            if (rating.UserId == userId)
+            {
+                return rating;
+            }
+        }
+        return null;
+    }
+}
