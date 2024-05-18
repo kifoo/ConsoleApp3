@@ -1,0 +1,85 @@
+﻿@page "/ratings/create"
+@inject MoviesRatingApp.Data.ApplicationDbContext DB
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+
+@using Microsoft.EntityFrameworkCore
+@using MoviesRatingApp.Data
+@using Microsoft.AspNetCore.Authorization
+
+@rendermode InteractiveServer
+@attribute [Authorize]
+
+<PageTitle>Add Rating</PageTitle>
+
+<h1>Add Rating</h1>
+
+<h4>Rating</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Rating" OnValidSubmit="AddRating" FormName="create" Enhance>
+            <DataAnnotationsValidator />       
+            <div class="mb-3">
+                <label for="value" class="form-label">Value:</label> 
+                <InputNumber id="value" @bind-Value="Rating.Value" class="form-control" /> 
+                <ValidationMessage For="() => Rating.Value" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/ratings">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    public Rating Rating { get; set; } = new();
+
+    Movies movie;
+    private string userName;
+    private List<Rating> ratings;
+
+    protected override async Task OnInitializedAsync()
+    {
+        movie = await DB.Movies.FirstOrDefaultAsync(m => m.Id == Id);
+
+        ratings = DB.Ratings.Where(r => r.MovieId == movie.Id).ToList();
+        if (ratings.Where(r => r.UserId == userName).Any())
+        {
+            NavigationManager.NavigateTo($"Ratings/edit?id={ratings.FirstOrDefault(r => r.UserId == userName).Id}");
+        }
+    }
+
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    public async Task AddRating()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        string userName = authState.User.Identity.Name;
+
+        Rating.MovieId = movie.Id;
+        Rating.UserId = userName;
+
+        DB.Ratings.Add(Rating);
+        await DB.SaveChangesAsync();
+
+        ratings.Add(Rating);
+        if (ratings.Count > 0)
+        {
+            double totalRating = 0;
+            foreach (var rating in ratings)
+            {
+                totalRating += rating.Value;
+            }
+            movie!.Rating = Math.Round((double)totalRating / ratings.Count, 2);
+        }
+        DB.Attach(movie).State = EntityState.Modified;
+        await DB.SaveChangesAsync();
+        NavigationManager.NavigateTo("/movies");
+    }
+}

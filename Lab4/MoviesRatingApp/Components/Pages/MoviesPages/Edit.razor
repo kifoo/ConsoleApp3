@@ -1,0 +1,111 @@
+﻿@page "/Movies/edit"
+@inject MoviesRatingApp.Data.ApplicationDbContext DB
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+
+@using Microsoft.EntityFrameworkCore
+@using MoviesRatingApp.Data
+@using Microsoft.AspNetCore.Authorization
+
+@rendermode InteractiveServer
+@attribute [Authorize]
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>Movies</h4>
+<hr />
+@if (Movies is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Movies" OnValidSubmit="UpdateMovies" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <input type="hidden" name="Movies.Id" value="@Movies.Id" />
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title:</label>
+                    <InputText id="title" @bind-Value="Movies.Title" class="form-control" />
+                    <ValidationMessage For="() => Movies.Title" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="genre" class="form-label">Genre:</label>
+                    <InputText id="genre" @bind-Value="Movies.Genre" class="form-control" />
+                    <ValidationMessage For="() => Movies.Genre" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="year" class="form-label">Year:</label>
+                    <InputNumber id="year" @bind-Value="Movies.Year" class="form-control" />
+                    <ValidationMessage For="() => Movies.Year" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="url" class="form-label">URL:</label>
+                    <InputText id="url" @bind-Value="Movies.URL" class="form-control" />
+                    <ValidationMessage For="() => Movies.URL" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <InputText id="description" @bind-Value="Movies.Description" class="form-control" />
+                    <ValidationMessage For="() => Movies.Description" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/movies">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    public Movies? Movies { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Movies ??= await DB.Movies.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Movies is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateMovies()
+    {
+        DB.Attach(Movies!).State = EntityState.Modified;
+
+        try
+        {
+            await DB.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!MoviesExists(Movies!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/movies");
+    }
+
+    bool MoviesExists(int id)
+    {
+        return DB.Movies.Any(e => e.Id == id);
+    }
+}

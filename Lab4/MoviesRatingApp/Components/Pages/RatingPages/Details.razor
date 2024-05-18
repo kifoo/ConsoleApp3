@@ -1,0 +1,63 @@
+﻿@page "/ratings/details"
+@inject MoviesRatingApp.Data.ApplicationDbContext DB
+@inject NavigationManager NavigationManager
+
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Authorization
+@using MoviesRatingApp.Data
+
+@rendermode InteractiveServer
+@attribute [Authorize]
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>Rating</h4>
+    <hr />
+    @if (rating is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Title</dt>
+            <dd class="col-sm-10">@movie.Title</dd>
+            <dt class="col-sm-2">Genre</dt>
+            <dd class="col-sm-10">@movie.Genre</dd>
+            <dt class="col-sm-2">Year</dt>
+            <dd class="col-sm-10">@movie.Year</dd>
+            <dt class="col-sm-2">Description</dt>
+            <dd class="col-sm-10">@movie.Description</dd>
+            <dt class="col-sm-2">URL</dt>
+            <dd class="col-sm-10">@movie.URL</dd>
+            <dt class="col-sm-2">Rating</dt>
+            <dd class="col-sm-10">@movie.Rating</dd>
+            <dt class="col-sm-2">Image</dt>
+            <dd class="col-sm-10"><img src="@movie.URL" alt="Movie Image" /></dd>
+        </dl>
+        <div>
+            <a href="@($"/ratings/edit?id={rating.Id}")">Edit</a> |
+            <a href="@($"/ratings")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    Rating? rating;
+    Movies? movie;
+
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        rating = await DB.Ratings.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (rating is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+        movie = await DB.Movies.FirstOrDefaultAsync(m => m.Id == rating.MovieId);
+    }
+}

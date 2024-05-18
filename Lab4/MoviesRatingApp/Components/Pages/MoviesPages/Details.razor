@@ -1,0 +1,83 @@
+﻿@page "/movies/details"
+@inject MoviesRatingApp.Data.ApplicationDbContext DB
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+
+@using MoviesRatingApp.Data
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>Movies</h4>
+    <hr />
+    @if (movie is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Title</dt>
+            <dd class="col-sm-10">@movie.Title</dd>
+            <dt class="col-sm-2">Genre</dt>
+            <dd class="col-sm-10">@movie.Genre</dd>
+            <dt class="col-sm-2">Year</dt>
+            <dd class="col-sm-10">@movie.Year</dd>
+            <dt class="col-sm-2">Rating</dt>
+            <dd class="col-sm-10">@movie.Rating</dd>
+            <dt class="col-sm-2">Description</dt>
+            <dd class="col-sm-10">@movie.Description</dd>
+            <dt class="col-sm-2">Image</dt>
+            <dd class="col-sm-10"><img src="@movie.URL" alt="Movie Image" /></dd>
+        </dl>
+        <div>
+            <AuthorizeView>
+                <Authorized>
+                    @if (movie.UserId == userName)
+                    {
+                        <a href="@($"/movies/edit?id={movie.Id}")">Edit</a>
+                        <text> | </text>
+                        <a href="@($"movies/delete?id={movie.Id}")"> Delete </a>
+                    }
+                    |
+                </Authorized>
+            </AuthorizeView>
+            <a href="@($"/movies")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    public string userName { get; set; }
+
+    Movies? movie;
+
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        userName = authState.User.Identity!.Name!;
+
+        movie = await DB.Movies.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (movie is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+
+        List<Rating> ratings = DB.Ratings.Where(r => r.MovieId == movie.Id).ToList();
+        if (ratings.Count > 0)
+        {
+            double totalRating = 0;
+            foreach (var rating in ratings)
+            {
+                totalRating += rating.Value;
+            }
+            movie!.Rating = Math.Round((double)totalRating / ratings.Count, 2);
+        }
+    }
+}

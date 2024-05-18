@@ -1,0 +1,115 @@
+﻿@page "/ratings"
+@inject MoviesRatingApp.Data.ApplicationDbContext DB
+@inject AuthenticationStateProvider AuthStateProvider
+
+@using MoviesRatingApp.Data
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Authorization
+
+@rendermode InteractiveServer
+@attribute [Authorize]
+
+<PageTitle>My Ratings</PageTitle>
+
+<h1>My Ratings</h1>
+
+
+@if (movies == null)
+{
+    <p><em>You have not rate anything. Start rating movies to see your ratings.</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th @onclick="() => Sort(SortTitle)" class="@(SortBy == "Title" ? (SortDirection == "asc" ? "ascending" : "descending") : "")">Title</th>
+                <th @onclick="() => Sort(SortGenre)" class="@(SortBy == "Genre" ? (SortDirection == "asc" ? "ascending" : "descending") : "")">Genre</th>
+                <th @onclick="() => Sort(SortYear)" class="@(SortBy == "Year" ? (SortDirection == "asc" ? "ascending" : "descending") : "")">Year</th>
+                <th @onclick="() => Sort(SortRating)" class="@(SortBy == "Rating" ? (SortDirection == "asc" ? "ascending" : "descending") : "")">Rating</th>
+                <th>My Rating</th>
+                <th> </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var movie in movies)
+            {
+                var userRating = GetUserRating(userName!, movie!);
+                <tr>
+                    <td>@movie.Title</td>
+                    <td>@movie.Genre</td>
+                    <td>@movie.Year</td>
+                    <td>@movie.Rating</td>
+                    <td>@userRating.Value</td>
+                    <td><a href="@($"Ratings/edit?id={userRating.Id}")">Edit</a> | <a href="@($"ratings/delete?id={userRating.Id}")">Delete</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    List<Movies> movies;
+    private string? userName;
+
+    public string SortBy { get; set; } = "Title";
+    public string SortDirection { get; set; } = "asc";
+
+    public string SortTitle { get; set; } = "Title";
+    public string SortGenre { get; set; } = "Genre";
+    public string SortYear { get; set; } = "Year";
+    public string SortRating { get; set; } = "Rating";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        userName = authState.User.Identity.Name;
+
+        movies = new List<Movies>();
+        List<Rating> Ratings = await DB.Ratings.Where(r => r.UserId == userName).ToListAsync();
+
+        if (Ratings.Any())
+        {
+            foreach (var rating in Ratings)
+            {
+                Movies movie = await DB.Movies.FirstOrDefaultAsync(m => rating.MovieId == m.Id);
+                if (movie != null)
+                {
+                    movies.Add(movie);
+                }
+            }
+        }
+        else
+        {
+            movies = null;
+        }
+    }
+
+    public Rating GetUserRating(string userId, Movies Movie)
+    {
+        List<Rating> Ratings = DB.Ratings.Where(r => r.MovieId == Movie.Id).ToList();
+        foreach (var rating in Ratings)
+        {
+            if (rating.UserId == userId)
+            {
+                return rating;
+            }
+        }
+        return null;
+    }
+
+    private void Sort(string column)
+    {
+        if (SortBy == column)
+        {
+            SortDirection = SortDirection == "asc" ? "desc" : "asc";
+        }
+        else
+        {
+            SortBy = column;
+            SortDirection = "asc";
+        }
+
+        movies = SortDirection == "asc" ? movies.OrderBy(m => m.GetType().GetProperty(SortBy)!.GetValue(m)).ToList() : movies.OrderByDescending(m => m.GetType().GetProperty(SortBy)!.GetValue(m)).ToList();
+    }
+}
