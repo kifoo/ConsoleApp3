@@ -1,7 +1,8 @@
-package org.example;
+package Solution;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class KnapsackProblem {
@@ -22,6 +23,10 @@ public class KnapsackProblem {
             Item newItem = new Item(i, value, weight);
             items.add(newItem);
         }
+    }
+
+    public List<Item> getItems() {
+        return items;
     }
 
     public Result solve(int capacity) {
@@ -52,5 +57,16 @@ public class KnapsackProblem {
             res.append(item).append("\n");
         }
         return res.toString();
+    }
+
+
+    public void shuffleItems() {
+        Random random = new Random();
+        for (int i = 0; i < items.size(); i++) {
+            int randomIndex = random.nextInt(items.size());
+            Item temp = items.get(i);
+            items.set(i, items.get(randomIndex));
+            items.set(randomIndex, temp);
+        }
     }
 }

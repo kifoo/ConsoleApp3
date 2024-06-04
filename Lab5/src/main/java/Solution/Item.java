@@ -1,4 +1,4 @@
-package org.example;
+package Solution;
 
 class Item {
     private int id;

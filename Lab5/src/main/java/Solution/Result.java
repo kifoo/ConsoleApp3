@@ -1,6 +1,7 @@
-package org.example;
+package Solution;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class Result {
@@ -28,7 +29,7 @@ public class Result {
         return capacity;
     }
 
-    public List<Item> getResult() {
+    public List<Item> getItems() {
         return result;
     }
 
@@ -52,4 +53,5 @@ public class Result {
         }
         return res.toString();
     }
+
 }

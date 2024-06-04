@@ -1,10 +1,10 @@
-package org.example;
+package Solution;
 
 import javax.swing.*;
 import java.awt.*;
 import java.text.NumberFormat;
 
-public class KnapsackGUI {
+public class KnapsackProblemGUI {
     private JFrame frame;
     private JFormattedTextField nField;
     private JFormattedTextField capacityField;
@@ -14,7 +14,7 @@ public class KnapsackGUI {
     private JTextArea outputArea;
     private JTextArea problemArea;
 
-    public KnapsackGUI() {
+    public KnapsackProblemGUI() {
         NumberFormat format = NumberFormat.getIntegerInstance();
         format.setGroupingUsed(false); // to disable comma grouping
         nField = new JFormattedTextField(format);
@@ -117,7 +117,7 @@ public class KnapsackGUI {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new KnapsackGUI();
+                new KnapsackProblemGUI();
             }
         });
     }
