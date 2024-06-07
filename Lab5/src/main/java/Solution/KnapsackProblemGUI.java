@@ -2,30 +2,41 @@ package Solution;
 
 import javax.swing.*;
 import java.awt.*;
-import java.text.NumberFormat;
+import java.text.*;
 
 public class KnapsackProblemGUI {
-    private JFrame frame;
-    private JFormattedTextField nField;
-    private JFormattedTextField capacityField;
-    private JFormattedTextField seedField;
-    private JFormattedTextField originField = new JFormattedTextField(2);
-    private JFormattedTextField boundField = new JFormattedTextField(11);
+    private final JFormattedTextField nField;
+    private final JFormattedTextField capacityField;
+    private final JFormattedTextField seedField;
+    private final JFormattedTextField originField;
+    private final JFormattedTextField boundField;
     private JTextArea outputArea;
     private JTextArea problemArea;
 
     public KnapsackProblemGUI() {
-        NumberFormat format = NumberFormat.getIntegerInstance();
-        format.setGroupingUsed(false); // to disable comma grouping
-        nField = new JFormattedTextField(format);
-        capacityField = new JFormattedTextField(format);
-        seedField = new JFormattedTextField(format);
+        NumberFormat formatInt = NumberFormat.getIntegerInstance();
+        formatInt.setGroupingUsed(false); // to disable comma grouping
+
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setDecimalSeparator('.');
+        DecimalFormat formatDouble = new DecimalFormat("#.###");;
+        formatDouble.setGroupingUsed(false);
+        formatDouble.setDecimalFormatSymbols(symbols);
+
+        nField = new JFormattedTextField(formatInt);
+        seedField = new JFormattedTextField(formatInt);
+        capacityField = new JFormattedTextField(formatDouble);
+        originField = new JFormattedTextField(formatDouble);
+        boundField = new JFormattedTextField(formatDouble);
+
+        originField.setValue(2.0);
+        boundField.setValue(11.0);
 
         createGUI();
     }
 
     private void createGUI() {
-        frame = new JFrame("Knapsack Problem");
+        JFrame frame = new JFrame("Knapsack Problem");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new GridLayout(1, 2));
 
@@ -100,11 +111,20 @@ public class KnapsackProblemGUI {
     }
 
     private void solveProblem() {
+        if (nField.getText() == null || nField.getText().isEmpty() ||
+                capacityField.getText() == null || capacityField.getText().isEmpty() ||
+                seedField.getText() == null || seedField.getText().isEmpty() ||
+                originField.getText() == null || originField.getText().isEmpty() ||
+                boundField.getText() == null || boundField.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Please input data in all fields.");
+            return;
+        }
+
         int n = Integer.parseInt(nField.getText());
-        int capacity = Integer.parseInt(capacityField.getText());
+        double capacity = Double.parseDouble(capacityField.getText());
         int seed = Integer.parseInt(seedField.getText());
-        int origin = Integer.parseInt(originField.getText());
-        int bound = Integer.parseInt(boundField.getText());
+        double origin = Double.parseDouble(originField.getText());
+        double bound = Double.parseDouble(boundField.getText());
 
         KnapsackProblem problem = new KnapsackProblem(n, seed, origin, bound);
         problemArea.setText(problem.toString());

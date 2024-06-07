@@ -1,12 +1,14 @@
 package Solution;
 
+import java.text.DecimalFormat;
+
 class Item {
     private int id;
-    private int value;
-    private int weight;
+    private double value;
+    private double weight;
     private int count;
 
-    public Item(int id, int value, int weight) {
+    public Item(int id, double value, double weight) {
         this.id = id;
         this.value = value;
         this.weight = weight;
@@ -17,11 +19,11 @@ class Item {
         return id;
     }
 
-    public int getValue() {
+    public double getValue() {
         return value;
     }
 
-    public int getWeight() {
+    public double getWeight() {
         return weight;
     }
 
@@ -32,12 +34,13 @@ class Item {
     public int getCount() {
         return count;
     }
-     public void updateCount() {
+
+    public void updateCount() {
         count += 1;
     }
 
     @Override
     public String toString() {
-        return "Item {id: " + id + ", value: " + value + ", weight: " + weight + "}";
+        return "No." + id + ",\t value: " + value + ",\t weight: " + weight;
     }
 }

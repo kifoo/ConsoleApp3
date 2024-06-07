@@ -5,27 +5,27 @@ import java.util.Collection;
 import java.util.List;
 
 public class Result {
-    private int capacity;
-    private int totalWeight;
-    private int totalValue;
+    private double capacity;
+    private double totalWeight;
+    private double totalValue;
     private List<Item> result;
 
-    public Result(int capacity){
+    public Result(double capacity){
         this.capacity = capacity;
         this.totalWeight = 0;
         this.totalValue = 0;
         this.result = new ArrayList<>();
     }
 
-    public int getTotalWeight() {
+    public double getTotalWeight() {
         return totalWeight;
     }
 
-    public int getTotalValue() {
+    public double getTotalValue() {
         return totalValue;
     }
 
-    public int getCapacity(){
+    public double getCapacity(){
         return capacity;
     }
 
@@ -34,7 +34,7 @@ public class Result {
     }
 
     public void addItemToList(Item addedItem){
-        if(result.indexOf(addedItem) == -1){
+        if(!result.contains(addedItem)){
             result.add(addedItem);
         }
         result.get(result.indexOf(addedItem)).updateCount();

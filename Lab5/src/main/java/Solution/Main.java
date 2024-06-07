@@ -12,7 +12,7 @@ public class Main {
         int n = Integer.parseInt(scanner.nextLine());
 
         System.out.println("Enter the capacity:");
-        int capacity = Integer.parseInt(scanner.nextLine());
+        double capacity = Double.parseDouble(scanner.nextLine());
 
         System.out.println("Enter the seed:");
         int seed = Integer.parseInt(scanner.nextLine());
